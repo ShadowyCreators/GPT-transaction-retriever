@@ -1,30 +1,31 @@
 require("dotenv").config();
 const { ethers } = require("ethers");
+const express = require("express");
+const app = express();
+const port = 3000;
 
 const provider = new ethers.JsonRpcProvider(
   `https://mainnet.infura.io/v3/${process.env.INFURA_KEY}`
 );
 
-async function blockNum() {
-  try {
-    const blockNumber = await provider.getBlockNumber();
-    console.log(blockNumber);
-  } catch (error) {
-    console.log(error);
-  }
-}
+app.get("/", (req, res) => {
+  res.send("Ethereum Blockchain Middleware is running!");
+});
 
-const transaction =
-  "0x354d967cf62d2c0dff6c1db897563fc4d7c4ee056fec4d7fc2397b3c2c49181a";
-async function transactionInfo() {
+
+app.get("/transaction/:hash", async (req, res) => {
   try {
-    const response = await provider.getTransaction(transaction);
-    const valueInWei = response.value;
+    const transactionHash = req.params.hash;
+    const transaction = await provider.getTransaction(transactionHash);
+    const valueInWei = transaction.value;
     const valueInEther = ethers.formatEther(valueInWei);
-    console.log(valueInEther);
-  } catch (error) {
-    console.log(error);
+    res.json({ value: valueInEther });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: err.message });
   }
-}
+});
 
-transactionInfo();
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
