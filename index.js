@@ -2,7 +2,7 @@ require("dotenv").config();
 const { ethers } = require("ethers");
 const express = require("express");
 const app = express();
-const port = 3000;
+const port = 80;
 
 const provider = new ethers.JsonRpcProvider(
   `https://mainnet.infura.io/v3/${process.env.INFURA_KEY}`
